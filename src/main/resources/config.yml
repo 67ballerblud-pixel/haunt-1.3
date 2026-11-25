@@ -1,0 +1,138 @@
+# Haunt - fake players and jumpscares, visible ONLY to the haunted player.
+# /haunt reload applies changes.
+
+defaults:
+  duration-seconds: 120
+  max-duration-seconds: 1800
+  intensity: 2                 # 1 = mild, 2 = medium, 3 = extreme
+
+# Who sees the fake players. false = only the haunted player (recommended). true = everyone nearby sees them.
+visible-to-others: false
+
+# What the fake players look like:
+#   DOPPELGANGER   = the haunted player's OWN skin (very creepy)
+#   RANDOM_ONLINE  = the skin of a random other online player
+#   NAMES          = a random skin from the "names" list below
+#   MIX            = a random pick of the above each time
+skin-mode: MIX
+names:
+  - Herobrine
+  - Notch
+  - Entity_303
+  - null
+  - Steve
+
+# Show the fake player's name tag above its head (set false to leave it nameless)
+show-name-tag: true
+
+# Nightmare mode (1.3): the haunting BUILDS instead of firing random scares at a flat rate.
+#   start  = subtle things you might doubt (a figure at the treeline, footsteps, a whisper)
+#   middle = the aggressive scares take over and the gaps between scares shrink
+#   end    = a scripted finale (blackout, heartbeat, your double, your own name in chat, then everything at once)
+nightmare:
+  escalate: true
+  ramp-seconds: 150            # how long it takes to go from subtle to worst. Short hauntings ramp faster.
+  finale: true                 # needs intensity 2+ and at least ~25s left. Also: /haunt scare <player> finale
+
+ambience:
+  night: true                  # only the haunted player sees it turn to night and start raining
+  sounds: true                 # random creepy sounds from around them
+
+scares:
+  # how often a scare happens (seconds) per intensity: [min, max]
+  interval:
+    1: [20, 40]
+    2: [8, 18]
+    3: [3, 9]                  # nightmare
+  # relative chance of each scare. Scares that need a higher intensity are skipped below it.
+  weights:
+    stalker: 20                # stands far away and stares. Vanishes when you look at it
+    behind: 22                 # appears right behind you. Turn around and it's in your face (intensity 2+)
+    rush: 15                   # runs at you from far away and screams (intensity 2+)
+    crowd: 8                   # a ring of them closes in (intensity 2+)
+    whisper: 15                # fake chat / fake deaths / join messages / action bar, using their name
+    sound: 20                  # footsteps, doors, chests, breathing
+    angel: 18                  # glowing figure that only moves while you are NOT looking at it (intensity 2+)
+    lightsout: 10              # their nearby torches/lanterns go out, silence, heartbeat, then it is behind them (intensity 2+)
+    watcher: 12                # glowing figure visible through walls that slowly creeps closer (intensity 2+)
+    silence: 10                # all sound cuts out, a breath behind them, then it appears (intensity 2+)
+    treeline: 22               # a silent figure at the edge of the render distance. Look at it and it is just gone
+    mimic: 12                  # YOUR double copies your movement from far away. Stop and it turns and comes (intensity 2+)
+    knock: 14                  # knocking from outside, louder and louder, then a door opens behind you
+    hiss: 10                   # a creeper hisses behind you. Nothing is there
+    wrong: 16                  # warped villager noises, a growl in the dark, someone screaming far away
+    eyes: 12                   # pairs of red eyes in the dark that blink and creep closer (also used outside caves)
+  max-ghosts: 24
+  rush-speed: 1.5              # blocks per 2 ticks
+  jumpscare:
+    cooldown-seconds: 6        # keeps jumpscares from stacking (also keeps flashes slow and safe)
+    title: "&4&l\u2620"        # shown for a moment on a jumpscare ("" = none)
+    subtitles:                 # one is picked at random under the skull. Placeholders: {player} {x} {y} {z} {item} {health} {world}
+      - "&8it's right behind you"
+      - "&4i found you, {player}"
+      - "&8don't look"
+      - "&4run"
+      - "&8{health} hearts. that's all you have"
+      - "&4i've been here since {x} {z}"
+    darkness: true             # brief darkness pulse (intensity 2+)
+    blindness: false           # brief blindness flash (intensity 3 only, off by default)
+    hurt-flash: false          # the red "hurt" camera tilt (no damage)
+
+# Cave scares: while a haunted player is underground (no sky above them, well below the surface) a share of
+# their scares are replaced by these, which use the tunnels, rock and ceiling around them. They also work with
+# /haunt scare <player> cave (even if the player is not really in a cave).
+cave:
+  enabled: true
+  chance: 55                   # % of scares that become cave scares while they are in a cave
+  min-depth: 8                 # how many blocks below the surface counts as "in a cave"
+  collapse-seconds: 8          # how long the fake rubble from a cave-in stays (only they see it, nothing real changes)
+  weights:
+    cavein: 10                 # the tunnel behind them collapses (fake rubble, intensity 2+)
+    tapping: 18                # something digging towards them through the rock, then it is behind them
+    eyes: 16                   # pairs of red eyes far down a tunnel that blink and creep closer
+    peeker: 16                 # a figure at the end of the tunnel that backs away when looked at
+    rumble: 20                 # dust and rocks fall from the ceiling, distant crashes
+
+# /haunt scare <player|all> [type] [intensity] works on anyone without a haunting. These are its defaults.
+scare-command:
+  intensity: 2
+  max-seconds: 90              # safety cap for the one-shot scare session
+
+messages:                      # sent privately to the haunted player. {player} {x} {y} {z} {item} {health} {world}
+  personal:                    # uses the victim's own in-game info (only they see it). Nothing outside the game is ever used.
+    - "<null> {player}, you're at {x} {y} {z}"
+    - "<null> nice {item}. i'll take it"
+    - "<Herobrine> {health} hearts. that's all that's left"
+    - "<???> i've been standing behind you since {x} {z}"
+    - "<null> {player}. look up"
+    - "<{player}> don't turn around"
+    - "<{player}> it's behind me too"
+    - "<null> you shouldn't have come to the {world}"
+  chat:
+    - "<Herobrine> i see you"
+    - "<Entity_303> behind you"
+    - "<null> dont turn around"
+    - "<Notch> you shouldn't be here"
+    - "<???> found you"
+    - "<Herobrine> {player}"
+    - "<null> hello {player}"
+    - "<Entity_303> i'm in your house, {player}"
+    - "<???> you can't log out"
+    - "<null> why did you leave the light on"
+  action-bar:
+    - "&8You feel like you're being watched..."
+    - "&8Did you hear that?"
+    - "&8Something is standing very close."
+    - "&4{player}..."
+    - "&8It knows where you sleep."
+  fake-join:
+    - "Herobrine joined the game"
+    - "null joined the game"
+    - "Entity_303 joined the game"
+    - "{player} joined the game"
+    - "{player} left the game"
+  fake-system:                 # plain white lines, like server messages
+    - "{player} was slain by null"
+    - "{player} fell out of the world"
+    - "null left the game"
+    - "[Server] {player} has made the advancement [Don't Look Back]"
